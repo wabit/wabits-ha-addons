@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.3.0
+
+- Leave `mqtt_username` / `mqtt_password` blank to use the credentials the
+  Supervisor issues for the Mosquitto add-on, so no MQTT password has to
+  live in the add-on options (which Home Assistant flags if the password
+  is weak). A username set in the options still takes precedence.
+
 ## 1.2.6
 
 - Fix: Notification retry logic with 3 attempts and 5s delay between retries

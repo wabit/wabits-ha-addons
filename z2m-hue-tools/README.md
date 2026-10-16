@@ -27,7 +27,7 @@ On each run:
 
 | Option | Description |
 | --- | --- |
-| `mqtt_host` / `mqtt_port` / `mqtt_username` / `mqtt_password` | MQTT broker connection, defaults to the Mosquitto add-on |
+| `mqtt_host` / `mqtt_port` / `mqtt_username` / `mqtt_password` | MQTT broker connection, defaults to the Mosquitto add-on; leave username/password blank to use the credentials the Supervisor provides for it |
 | `zigbee2mqtt_topic` | Base MQTT topic Zigbee2MQTT publishes on |
 | `hue_native_control` | `unchanged` (default, does nothing), `true`, or `false` — controls the light using Philips' native protocol (atomic on/off + brightness + color + color temperature commands) instead of standard Zigbee commands; required for the Effect color update mode |
 | `hue_power_on_behavior` | `unchanged` (default, does nothing), `default`, `on`, `off`, `toggle`, or `previous` |

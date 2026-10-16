@@ -19,6 +19,7 @@ CONFIG_PATH="/app/addon-options.json"
 
 # Use node to transform the flat HA options into our nested config format
 node -e "
+(async () => {
 const opts = require('${OPTIONS_PATH}');
 const config = {
   mqtt: {
@@ -36,6 +37,28 @@ const config = {
   debug: opts.debug === true,
   devices: opts.devices || []
 };
+// Blank username: use the credentials the Supervisor issues to this add-on for
+// the Mosquitto add-on (services: mqtt:need), so no password lives in options.
+if (!config.mqtt.username) {
+  try {
+    const res = await fetch('http://supervisor/services/mqtt', {
+      headers: { Authorization: 'Bearer ' + process.env.SUPERVISOR_TOKEN }
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const svc = (await res.json()).data;
+    if (svc.host === config.mqtt.host) {
+      config.mqtt.username = svc.username;
+      config.mqtt.password = svc.password;
+      console.log('[INFO] MQTT credentials: provided by the Supervisor MQTT service');
+    } else {
+      console.log('[INFO] MQTT credentials: none (broker ' + config.mqtt.host + ' is not the Supervisor MQTT service at ' + svc.host + ')');
+    }
+  } catch (e) {
+    console.log('[WARN] MQTT credentials: none (Supervisor MQTT service unavailable: ' + e.message + ')');
+  }
+} else {
+  console.log('[INFO] MQTT credentials: from add-on options');
+}
 require('fs').writeFileSync('${CONFIG_PATH}', JSON.stringify(config, null, 2));
 console.log('[INFO] Configuration loaded:');
 console.log('[INFO]   MQTT broker: ' + config.mqtt.host + ':' + config.mqtt.port);
@@ -47,7 +70,8 @@ console.log('[INFO]   Check interval: ' + config.check_interval_hours + 'h');
 console.log('[INFO]   Notifications: ' + (config.enable_notifications ? 'enabled' : 'disabled'));
 console.log('[INFO]   Debug: ' + (config.debug ? 'enabled' : 'disabled'));
 console.log('[INFO]   Devices: ' + (config.devices.length ? config.devices.join(', ') : 'ALL (auto-discover)'));
-"
+})().catch((e) => { console.error('[ERROR] ' + e.message); process.exit(1); });
+" || exit 1
 
 # Run the updater
 exec tsx /app/src/index.ts "${CONFIG_PATH}"

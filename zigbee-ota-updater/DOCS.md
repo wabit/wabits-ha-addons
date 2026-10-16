@@ -20,8 +20,8 @@ Runs continuously and checks your Zigbee2MQTT devices for OTA firmware updates o
 |--------|---------|-------------|
 | `mqtt_host` | `core-mosquitto` | MQTT broker hostname. Use `core-mosquitto` for the built-in HA broker. |
 | `mqtt_port` | `1883` | MQTT broker port. |
-| `mqtt_username` | _(empty)_ | MQTT username. Leave empty if your broker doesn't require auth. |
-| `mqtt_password` | _(empty)_ | MQTT password. |
+| `mqtt_username` | _(empty)_ | MQTT username. Leave empty to use the credentials the Supervisor provides for the Mosquitto add-on. |
+| `mqtt_password` | _(empty)_ | MQTT password. Leave empty along with the username. |
 
 ### Update Settings
 
